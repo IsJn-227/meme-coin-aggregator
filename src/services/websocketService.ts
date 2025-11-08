@@ -1,7 +1,7 @@
 ﻿import { Server as SocketServer } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import { tokenService } from './tokenService';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 export class WebSocketService {
   private io: SocketServer;

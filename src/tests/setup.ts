@@ -1,24 +1,24 @@
-﻿import { redisClient } from '../config/redis';
+﻿import { getRedisClient, closeRedisConnection } from '../config/redis';
 
 beforeAll(async () => {
-  if (!redisClient.isOpen) {
-    try {
-      await redisClient.connect();
-    } catch (error) {
-      console.log('Redis already connected or error:', error);
-    }
+  // Setup test environment
+  process.env.NODE_ENV = 'test';
+  process.env.REDIS_URL = 'redis://localhost:6379';
+  
+  try {
+    const redis = getRedisClient();
+    await redis.ping();
+  } catch (error) {
+    console.log('Redis not available for tests, using mock');
   }
 });
 
 afterAll(async () => {
   try {
-    if (redisClient.isOpen) {
-      await redisClient.flushAll();
-      await redisClient.quit();
-    }
+    await closeRedisConnection();
   } catch (error) {
-    console.error('Error in test cleanup:', error);
+    console.log('Error closing Redis connection');
   }
 });
 
-jest.setTimeout(30000);
+jest.setTimeout(10000);

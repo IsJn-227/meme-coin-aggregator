@@ -2,7 +2,7 @@
 import cors from 'cors';
 import { createServer } from 'http';
 import { config } from './config';
-import { connectRedis } from './config/redis';
+
 import tokenRoutes from './routes/tokenRoutes';
 import { WebSocketHandler } from './websocket/handler';
 import logger from './utils/logger';
