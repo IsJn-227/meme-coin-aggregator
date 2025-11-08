@@ -5,7 +5,7 @@ import logger from '../utils/logger';
 const router = Router();
 
 // GET /api/tokens - Get paginated token list
-router.get('/tokens', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const {
       limit = '30',
@@ -34,7 +34,8 @@ router.get('/tokens', async (req: Request, res: Response) => {
 });
 
 // GET /api/tokens/:address - Get specific token
-router.get('/tokens/:address([1-9A-HJ-NP-Za-km-z]{32,44})', async (req: Request, res: Response) => {
+// Use regex to match only valid Solana addresses (32-44 chars, base58)
+router.get('/:address([1-9A-HJ-NP-Za-km-z]{32,44})', async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
     
@@ -56,8 +57,8 @@ router.get('/tokens/:address([1-9A-HJ-NP-Za-km-z]{32,44})', async (req: Request,
   }
 });
 
-// POST /api/tokens/clear-cache - Clear token cache
-router.post('/tokens/clear-cache', async (req: Request, res: Response) => {
+// POST /api/tokens/clear-cache - Clear token cache (for testing)
+router.post('/clear-cache', async (req: Request, res: Response) => {
   try {
     await tokenService.clearCache();
     res.json({ message: 'Cache cleared successfully' });
