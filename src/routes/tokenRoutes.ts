@@ -1,0 +1,78 @@
+﻿import { Router, Request, Response } from 'express';
+import { tokenService } from '../services/tokenService';
+import logger from '../utils/logger';
+
+const router = Router();
+
+// GET /api/tokens - Get paginated token list
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const {
+      limit = '30',
+      cursor,
+      sortBy = 'volume_sol',
+      sortOrder = 'desc',
+      timePeriod = '24h'
+    } = req.query;
+
+    const result = await tokenService.getTokens({
+      limit: parseInt(limit as string),
+      cursor: cursor as string,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as 'asc' | 'desc',
+      timePeriod: timePeriod as string
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in GET /api/tokens', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch tokens',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// GET /api/tokens/:address - Get specific token
+router.get('/:address', async (req: Request, res: Response) => {
+  try {
+    const { address } = req.params;
+
+    if (!address || address.length < 32) {
+      return res.status(400).json({ 
+        error: 'Invalid token address' 
+      });
+    }
+
+    const token = await tokenService.getTokenByAddress(address);
+
+    if (!token) {
+      return res.status(404).json({ 
+        error: 'Token not found' 
+      });
+    }
+
+    res.json(token);
+  } catch (error) {
+    logger.error('Error in GET /api/tokens/:address', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch token',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// POST /api/tokens/clear-cache - Clear token cache (for testing)
+router.post('/clear-cache', async (req: Request, res: Response) => {
+  try {
+    await tokenService.clearCache();
+    res.json({ message: 'Cache cleared successfully' });
+  } catch (error) {
+    logger.error('Error clearing cache', error);
+    res.status(500).json({ 
+      error: 'Failed to clear cache' 
+    });
+  }
+});
+
+export default router;
