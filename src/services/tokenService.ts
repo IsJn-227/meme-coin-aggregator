@@ -1,7 +1,7 @@
 ﻿import { TokenData, PaginatedResponse } from '../types';
 import { dexScreenerService } from './dexScreenerService';
 import { jupiterService } from './jupiterService';
-import { cacheService } from './cacheService';
+import cacheService from './cacheService';
 import { getMockTokens } from './mockData';
 import logger from '../utils/logger';
 

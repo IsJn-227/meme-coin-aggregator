@@ -1,102 +1,68 @@
-﻿import express, { Request, Response } from 'express';
-import cors from 'cors';
+﻿import express, { Request, Response, NextFunction } from 'express';
 import { createServer } from 'http';
-import { config } from './config';
-
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import config from './config';
 import tokenRoutes from './routes/tokenRoutes';
-import { WebSocketHandler } from './websocket/handler';
 import logger from './utils/logger';
+import { WebSocketService } from './services/websocketService';
 
 const app = express();
-const httpServer = createServer(app);
 
 // Middleware
+app.use(helmet());
 app.use(cors());
+app.use(compression());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Request logging
-app.use((req: Request, res: Response, next) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    logger.info(req.method + ' ' + req.path + ' ' + res.statusCode + ' - ' + duration + 'ms');
-  });
+app.use((req: Request, res: Response, next: NextFunction) => {
+  logger.info(`${req.method} ${req.path}`);
   next();
 });
 
-// Routes
+// Health check
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-app.use('/api/tokens', tokenRoutes);
+// Routes
+app.use('/api', tokenRoutes);
+
+// Error handling
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error('Unhandled error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
+  });
+});
 
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Error handler
-app.use((err: Error, req: Request, res: Response, next: any) => {
-  logger.error('Unhandled error:', err);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: config.nodeEnv === 'development' ? err.message : undefined
-  });
+// Create HTTP server and WebSocket
+const httpServer = createServer(app);
+const wsService = new WebSocketService(httpServer);
+
+// Start periodic updates
+wsService.startPeriodicUpdates();
+
+const PORT = config.port;
+
+httpServer.listen(PORT, () => {
+  logger.info(`Server running on port ${PORT}`);
+  logger.info('WebSocket server initialized');
 });
-
-// Initialize WebSocket
-let wsHandler: WebSocketHandler;
-
-async function startServer() {
-  try {
-    // Connect to Redis
-    await connectRedis();
-    logger.info('Connected to Redis');
-
-    // Initialize WebSocket handler
-    wsHandler = new WebSocketHandler(httpServer);
-    logger.info('WebSocket handler initialized');
-
-    // Start HTTP server
-    httpServer.listen(config.port, () => {
-      logger.info('Server running on port ' + config.port);
-      logger.info('Environment: ' + config.nodeEnv);
-      logger.info('Health check: http://localhost:' + config.port + '/health');
-      logger.info('API endpoint: http://localhost:' + config.port + '/api/tokens');
-    });
-  } catch (error) {
-    logger.error('Failed to start server:', error);
-    process.exit(1);
-  }
-}
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  if (wsHandler) wsHandler.stop();
-  httpServer.close(() => {
-    logger.info('Server closed');
-    process.exit(0);
-  });
+process.on('SIGTERM', () => {
+  wsService.stopPeriodicUpdates();
+  httpServer.close();
 });
-
-process.on('SIGINT', async () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  if (wsHandler) wsHandler.stop();
-  httpServer.close(() => {
-    logger.info('Server closed');
-    process.exit(0);
-  });
-});
-
-// Start the server
-if (require.main === module) {
-  startServer();
-}
 
 export default app;
