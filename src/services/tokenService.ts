@@ -29,7 +29,7 @@ class TokenService {
     try {
       // Try cache first
       const cacheKey = this.CACHE_KEY + ':sorted:' + sortBy + ':' + sortOrder;
-      let tokens = await cacheService.get<TokenData[]>(cacheKey);
+      let tokens = await cacheService.get(cacheKey);
 
       if (!tokens) {
         logger.info('Cache miss - fetching from APIs');
@@ -68,7 +68,7 @@ class TokenService {
     try {
       // Check cache first
       const cacheKey = this.TOKEN_CACHE_PREFIX + address;
-      let token = await cacheService.get<TokenData>(cacheKey);
+      let token = await cacheService.get(cacheKey);
 
       if (!token) {
         logger.info('Cache miss for token ' + address);

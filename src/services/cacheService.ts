@@ -38,6 +38,18 @@ export class CacheService {
       logger.error('Cache delete error:', error);
     }
   }
+
+  async clear(pattern: string): Promise<void> {
+    try {
+      const redis = getRedisClient();
+      const keys = await redis.keys(pattern);
+      if (keys.length > 0) {
+        await redis.del(...keys);
+      }
+    } catch (error) {
+      logger.error('Cache clear error:', error);
+    }
+  }
 }
 
 export default new CacheService();
