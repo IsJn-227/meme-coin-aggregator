@@ -1,36 +1,45 @@
-﻿import { createClient } from 'redis';
-import { config } from './index';
+﻿import { Redis } from 'ioredis';
+import config from './index';
+import logger from '../utils/logger';
 
-export const redisClient = createClient({
-  url: config.redisUrl,
-  socket: {
-    reconnectStrategy: (retries) => {
-      if (retries > 10) {
-        console.error('Too many Redis reconnection attempts');
-        return new Error('Redis connection failed');
-      }
-      return Math.min(retries * 100, 3000);
-    }
+let redisClient: Redis | null = null;
+
+export const getRedisClient = (): Redis => {
+  if (!redisClient) {
+    const redisUrl = config.redisUrl || 'redis://localhost:6379';
+    
+    redisClient = new Redis(redisUrl, {
+      maxRetriesPerRequest: 3,
+      retryStrategy(times) {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      },
+      reconnectOnError(err) {
+        const targetError = 'READONLY';
+        if (err.message.includes(targetError)) {
+          return true;
+        }
+        return false;
+      },
+      tls: redisUrl.startsWith('rediss://') ? {} : undefined,
+    });
+
+    redisClient.on('connect', () => {
+      logger.info('Redis connected successfully');
+    });
+
+    redisClient.on('error', (err) => {
+      logger.error('Redis connection error:', err);
+    });
   }
-});
 
-redisClient.on('error', (err) => console.error('Redis Client Error:', err));
-redisClient.on('connect', () => console.log('Redis Client Connected'));
-redisClient.on('ready', () => console.log('Redis Client Ready'));
+  return redisClient;
+};
 
-export async function connectRedis() {
-  try {
-    await redisClient.connect();
-  } catch (error) {
-    console.error('Failed to connect to Redis:', error);
-    throw error;
-  }
-}
-
-export async function disconnectRedis() {
-  try {
+export const closeRedisConnection = async (): Promise<void> => {
+  if (redisClient) {
     await redisClient.quit();
-  } catch (error) {
-    console.error('Error disconnecting from Redis:', error);
+    redisClient = null;
+    logger.info('Redis connection closed');
   }
-}
+};
