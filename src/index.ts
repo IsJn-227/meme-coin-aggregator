@@ -41,7 +41,6 @@ app.use((req, res) => {
 
 const httpServer = createServer(app);
 const wsService = new WebSocketService(httpServer);
-
 wsService.startPeriodicUpdates();
 
 const PORT = config.port;
@@ -57,4 +56,3 @@ process.on('SIGTERM', () => {
 });
 
 export default app;
-
