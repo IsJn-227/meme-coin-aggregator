@@ -1,0 +1,565 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Coin Aggregator - WebSocket Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { 
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 32px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        .config-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 2px solid #e0e0e0;
+        }
+        .config-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .config-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .config-row label {
+            min-width: 120px;
+            font-weight: 500;
+            color: #555;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            padding: 10px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-disconnect {
+            background: #f44336;
+        }
+        .btn-disconnect:hover:not(:disabled) {
+            background: #d32f2f;
+        }
+        .btn-api {
+            background: #4caf50;
+        }
+        .btn-api:hover:not(:disabled) {
+            background: #388e3c;
+        }
+        #status {
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .connected { 
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        .disconnected { 
+            background: linear-gradient(135deg, #f44336, #e53935);
+            color: white;
+        }
+        .connecting {
+            background: linear-gradient(135deg, #ff9800, #fb8c00);
+            color: white;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #tokens {
+            margin-top: 30px;
+        }
+        .section-title {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .token {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            margin: 12px 0;
+            border-radius: 12px;
+            transition: all 0.3s;
+            animation: slideIn 0.4s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .token:hover {
+            border-color: #667eea;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+            transform: translateY(-3px);
+        }
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .token-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .token-ticker {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .token-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .detail-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .detail-label {
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .detail-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .price-up { color: #4caf50; }
+        .price-down { color: #f44336; }
+        .price-neutral { color: #757575; }
+        #logs {
+            margin-top: 30px;
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            max-height: 350px;
+            overflow-y: auto;
+            border: 2px solid #333;
+        }
+        .log-entry {
+            margin: 6px 0;
+            padding: 6px 10px;
+            border-left: 3px solid #00ff00;
+            padding-left: 12px;
+            line-height: 1.5;
+        }
+        .log-error { border-left-color: #ff3333; color: #ff6666; }
+        .log-info { border-left-color: #33aaff; color: #66ccff; }
+        .log-success { border-left-color: #00ff00; color: #66ff66; }
+        .log-warning { border-left-color: #ffaa00; color: #ffcc66; }
+        
+        /* Scrollbar styling */
+        #logs::-webkit-scrollbar {
+            width: 10px;
+        }
+        #logs::-webkit-scrollbar-track {
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+        #logs::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+        #logs::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Meme Coin Aggregator - WebSocket Live Monitor</h1>
+        <div class="subtitle">Real-time cryptocurrency data aggregation with live updates</div>
+        
+        <div class="config-section">
+            <div class="config-title">🔧 Connection Configuration</div>
+            <div class="config-row">
+                <label>WebSocket URL:</label>
+                <input type="text" id="wsUrl" value="wss://meme-coin-aggregator-e8er.onrender.com">
+                <button id="connectBtn" onclick="connectWebSocket()">🔌 Connect</button>
+                <button id="disconnectBtn" class="btn-disconnect" onclick="disconnectWebSocket()" disabled>⏹️ Disconnect</button>
+            </div>
+            <div class="config-row">
+                <label>REST API URL:</label>
+                <input type="text" id="apiUrl" value="https://meme-coin-aggregator-e8er.onrender.com/api/tokens">
+                <button class="btn-api" onclick="testRestApi()">📡 Test REST API</button>
+            </div>
+        </div>
+        
+        <div id="status" class="disconnected">❌ Not Connected - Click "Connect" to start</div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Updates</div>
+                <div class="stat-value" id="updateCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Tokens Tracked</div>
+                <div class="stat-value" id="tokenCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Connection Time</div>
+                <div class="stat-value" id="connectionTime">0s</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Last Update</div>
+                <div class="stat-value" id="lastUpdate" style="font-size: 18px;">Never</div>
+            </div>
+        </div>
+        
+        <div id="tokens"></div>
+        
+        <div class="section-title">📊 Connection Logs</div>
+        <div id="logs"></div>
+    </div>
+    
+    <script>
+        let ws = null;
+        let updateCount = 0;
+        let connectionStart = null;
+        let connectionInterval = null;
+        
+        const status = document.getElementById('status');
+        const tokensDiv = document.getElementById('tokens');
+        const logsDiv = document.getElementById('logs');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        
+        function addLog(message, type = 'info') {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logsDiv.insertBefore(logEntry, logsDiv.firstChild);
+            
+            while (logsDiv.children.length > 100) {
+                logsDiv.removeChild(logsDiv.lastChild);
+            }
+        }
+        
+        function updateConnectionTime() {
+            if (connectionStart) {
+                const elapsed = Math.floor((Date.now() - connectionStart) / 1000);
+                document.getElementById('connectionTime').textContent = elapsed + 's';
+            }
+        }
+        
+        function formatNumber(num) {
+            if (!num || isNaN(num)) return '0';
+            if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(2) + 'K';
+            return num.toFixed(2);
+        }
+        
+        function connectWebSocket() {
+            const wsUrl = document.getElementById('wsUrl').value;
+            
+            if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) {
+                addLog('⚠️ Already connected or connecting to WebSocket', 'warning');
+                return;
+            }
+            
+            addLog(`🔄 Attempting to connect to: ${wsUrl}`, 'info');
+            status.textContent = '⏳ Connecting to WebSocket server...';
+            status.className = 'connecting';
+            connectBtn.disabled = true;
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = () => {
+                    status.textContent = '✅ Connected - Receiving Live Updates Every 30s';
+                    status.className = 'connected';
+                    connectionStart = Date.now();
+                    connectBtn.disabled = true;
+                    disconnectBtn.disabled = false;
+                    addLog('✅ WebSocket connection established successfully!', 'success');
+                    addLog('📡 Waiting for server updates (every 30 seconds)...', 'info');
+                    
+                    connectionInterval = setInterval(updateConnectionTime, 1000);
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        updateCount++;
+                        document.getElementById('updateCount').textContent = updateCount;
+                        
+                        const now = new Date().toLocaleTimeString();
+                        document.getElementById('lastUpdate').textContent = now;
+                        
+                        const tokenCount = data.tokens ? data.tokens.length : 0;
+                        addLog(`📦 Received update #${updateCount} with ${tokenCount} tokens`, 'success');
+                        
+                        if (data.type === 'update' && data.tokens && data.tokens.length > 0) {
+                            displayTokens(data.tokens);
+                        } else if (tokenCount === 0) {
+                            addLog('⚠️ Received empty token list', 'warning');
+                        }
+                    } catch (error) {
+                        addLog(`❌ Error parsing message: ${error.message}`, 'error');
+                        console.error('Error parsing WebSocket message:', error);
+                    }
+                };
+                
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    status.textContent = '❌ WebSocket Error - Connection Failed';
+                    status.className = 'disconnected';
+                    addLog('❌ WebSocket error - Server may be down or URL incorrect', 'error');
+                    addLog('💡 Try: 1) Check if server is running 2) Verify URL 3) Check network', 'info');
+                    connectBtn.disabled = false;
+                    disconnectBtn.disabled = true;
+                };
+                
+                ws.onclose = (event) => {
+                    status.textContent = '❌ Disconnected from WebSocket';
+                    status.className = 'disconnected';
+                    const reason = event.reason || 'No reason provided';
+                    addLog(`⚠️ WebSocket closed - Code: ${event.code}, Reason: ${reason}`, 'warning');
+                    clearInterval(connectionInterval);
+                    connectBtn.disabled = false;
+                    disconnectBtn.disabled = true;
+                    
+                    // Auto-reconnect after 5 seconds if not manually disconnected
+                    if (event.code !== 1000) {
+                        addLog('🔄 Will attempt to reconnect in 5 seconds...', 'info');
+                        setTimeout(() => {
+                            if (!ws || ws.readyState === WebSocket.CLOSED) {
+                                addLog('🔄 Attempting automatic reconnection...', 'info');
+                                connectWebSocket();
+                            }
+                        }, 5000);
+                    }
+                };
+                
+            } catch (error) {
+                addLog(`❌ Failed to create WebSocket: ${error.message}`, 'error');
+                status.textContent = '❌ Connection Failed';
+                status.className = 'disconnected';
+                connectBtn.disabled = false;
+            }
+        }
+        
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close(1000, 'Manual disconnect');
+                addLog('👋 Manually disconnected from WebSocket', 'info');
+            }
+        }
+        
+        async function testRestApi() {
+            const apiUrl = document.getElementById('apiUrl').value;
+            addLog(`🔍 Testing REST API: ${apiUrl}`, 'info');
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(apiUrl + '?limit=10');
+                const responseTime = Date.now() - startTime;
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                addLog(`✅ REST API responding! (${responseTime}ms) - Got ${data.data ? data.data.length : 0} tokens`, 'success');
+                
+                if (data.data && data.data.length > 0) {
+                    displayTokens(data.data);
+                } else {
+                    addLog('⚠️ API returned empty data', 'warning');
+                }
+            } catch (error) {
+                addLog(`❌ REST API Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function displayTokens(tokens) {
+            document.getElementById('tokenCount').textContent = tokens.length;
+            
+            tokensDiv.innerHTML = '<div class="section-title">💎 Live Token Data (Top 10)</div>';
+            
+            tokens.slice(0, 10).forEach((token, index) => {
+                const priceChange = token.price_1hr_change || 0;
+                const priceChangeClass = priceChange > 0 ? 'price-up' : 
+                                        priceChange < 0 ? 'price-down' : 'price-neutral';
+                const priceChangeSymbol = priceChange > 0 ? '▲' : 
+                                         priceChange < 0 ? '▼' : '●';
+                
+                const tokenDiv = document.createElement('div');
+                tokenDiv.className = 'token';
+                tokenDiv.style.animationDelay = `${index * 0.05}s`;
+                tokenDiv.innerHTML = `
+                    <div class="token-header">
+                        <div class="token-name">${token.token_name || 'Unknown Token'}</div>
+                        <div class="token-ticker">${token.token_ticker || 'N/A'}</div>
+                    </div>
+                    <div class="token-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Price (SOL)</div>
+                            <div class="detail-value">${token.price_sol ? token.price_sol.toExponential(2) : 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Market Cap</div>
+                            <div class="detail-value">${formatNumber(token.market_cap_sol)} SOL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Volume (24h)</div>
+                            <div class="detail-value">${formatNumber(token.volume_sol)} SOL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Liquidity</div>
+                            <div class="detail-value">${formatNumber(token.liquidity_sol)} SOL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Transactions</div>
+                            <div class="detail-value">${(token.transaction_count || 0).toLocaleString()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">1hr Change</div>
+                            <div class="detail-value ${priceChangeClass}">
+                                ${priceChangeSymbol} ${Math.abs(priceChange).toFixed(2)}%
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Protocol</div>
+                            <div class="detail-value" style="font-size: 13px;">${token.protocol || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Address</div>
+                            <div class="detail-value" style="font-size: 10px; word-break: break-all;">${token.token_address ? token.token_address.substring(0, 8) + '...' : 'N/A'}</div>
+                        </div>
+                    </div>
+                `;
+                tokensDiv.appendChild(tokenDiv);
+            });
+        }
+        
+        // Initial page load
+        window.addEventListener('load', () => {
+            addLog('🌐 Page loaded successfully', 'success');
+            addLog('💡 Tip: Test REST API first, then connect to WebSocket', 'info');
+            addLog('📍 Server: https://meme-coin-aggregator-e8er.onrender.com', 'info');
+            
+            // Auto-test REST API on load
+            setTimeout(() => {
+                testRestApi();
+            }, 500);
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            }
+        });
+    </script>
+</body>
+</html>

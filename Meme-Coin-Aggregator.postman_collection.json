@@ -1,0 +1,326 @@
+﻿{
+  "info": {
+    "name": "Meme Coin Aggregator API - Complete Collection",
+    "description": "Comprehensive API collection for testing the Meme Coin Aggregator service\n\nGitHub: https://github.com/IsJn-227/meme-coin-aggregator\nLive API: https://meme-coin-aggregator-e8er.onrender.com",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://meme-coin-aggregator-e8er.onrender.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "✅ Verify the service is running and healthy\n\nExpected response:\n- Status: 200\n- Body: { status: 'healthy', timestamp: '...' }"
+      }
+    },
+    {
+      "name": "02 - Get All Tokens (Default)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"]
+        },
+        "description": "📊 Get paginated list of tokens with default parameters\n\nDefaults:\n- limit: 30\n- sortBy: volume_sol\n- sortOrder: desc"
+      }
+    },
+    {
+      "name": "03 - Get Top 10 Tokens",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "limit", "value": "10"}]
+        },
+        "description": "🔝 Get only the top 10 tokens by volume"
+      }
+    },
+    {
+      "name": "04 - Top Tokens by Volume",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=20&sortBy=volume_sol&sortOrder=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "20"},
+            {"key": "sortBy", "value": "volume_sol"},
+            {"key": "sortOrder", "value": "desc"}
+          ]
+        },
+        "description": "📈 Tokens sorted by 24h trading volume (highest first)"
+      }
+    },
+    {
+      "name": "05 - Top Gainers (1hr)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=15&sortBy=price_1hr_change&sortOrder=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "15"},
+            {"key": "sortBy", "value": "price_1hr_change"},
+            {"key": "sortOrder", "value": "desc"}
+          ]
+        },
+        "description": "🚀 Best performing tokens by 1hr price change"
+      }
+    },
+    {
+      "name": "06 - Top Losers (1hr)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=15&sortBy=price_1hr_change&sortOrder=asc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "15"},
+            {"key": "sortBy", "value": "price_1hr_change"},
+            {"key": "sortOrder", "value": "asc"}
+          ]
+        },
+        "description": "📉 Worst performing tokens by 1hr price change"
+      }
+    },
+    {
+      "name": "07 - Top by Market Cap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=20&sortBy=market_cap_sol&sortOrder=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "20"},
+            {"key": "sortBy", "value": "market_cap_sol"},
+            {"key": "sortOrder", "value": "desc"}
+          ]
+        },
+        "description": "💰 Tokens sorted by market capitalization"
+      }
+    },
+    {
+      "name": "08 - Top by Liquidity",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=20&sortBy=liquidity_sol&sortOrder=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "20"},
+            {"key": "sortBy", "value": "liquidity_sol"},
+            {"key": "sortOrder", "value": "desc"}
+          ]
+        },
+        "description": "💧 Tokens with highest liquidity pools"
+      }
+    },
+    {
+      "name": "09 - Pagination Page 1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=10&cursor=0",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "10"},
+            {"key": "cursor", "value": "0"}
+          ]
+        },
+        "description": "📄 First page of results (tokens 1-10)"
+      }
+    },
+    {
+      "name": "10 - Pagination Page 2",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=10&cursor=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "10"},
+            {"key": "cursor", "value": "10"}
+          ]
+        },
+        "description": "📄 Second page of results (tokens 11-20)"
+      }
+    },
+    {
+      "name": "11 - Pagination Page 3",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=10&cursor=20",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "10"},
+            {"key": "cursor", "value": "20"}
+          ]
+        },
+        "description": "📄 Third page of results (tokens 21-30)"
+      }
+    },
+    {
+      "name": "12 - Get Token by Address",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens/FQ1738Xg5TpXYEXC4Mvnd1U73o49auzoCV3bkVwcpump",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens", "FQ1738Xg5TpXYEXC4Mvnd1U73o49auzoCV3bkVwcpump"]
+        },
+        "description": "🔍 Get specific token by Solana address\n\nNote: Replace address with actual token address from /api/tokens response"
+      }
+    },
+    {
+      "name": "13 - Clear Cache",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens/clear-cache",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens", "clear-cache"]
+        },
+        "description": "🗑️ Clear Redis cache and force fresh data fetch\n\nUse this to test cache invalidation"
+      }
+    },
+    {
+      "name": "14 - Max Limit Test (100)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=100",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "limit", "value": "100"}]
+        },
+        "description": "✅ Test maximum allowed limit (should succeed)"
+      }
+    },
+    {
+      "name": "15 - Invalid Limit (should fail)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=150",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "limit", "value": "150"}]
+        },
+        "description": "❌ Test limit exceeding maximum (should return 400 error)"
+      }
+    },
+    {
+      "name": "16 - Invalid Sort Field (should fail)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?sortBy=invalid_field",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "sortBy", "value": "invalid_field"}]
+        },
+        "description": "❌ Test invalid sort field (should return 400 error)"
+      }
+    },
+    {
+      "name": "17 - Invalid Token Address (should fail)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens/invalid-address-123",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens", "invalid-address-123"]
+        },
+        "description": "❌ Test non-existent token address (should return 404 error)"
+      }
+    },
+    {
+      "name": "18 - Negative Limit (should fail)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=-10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "limit", "value": "-10"}]
+        },
+        "description": "❌ Test negative limit (should return 400 error)"
+      }
+    },
+    {
+      "name": "19 - Invalid Sort Order (should fail)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?sortOrder=invalid",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "sortOrder", "value": "invalid"}]
+        },
+        "description": "❌ Test invalid sort order (should return 400 error)"
+      }
+    },
+    {
+      "name": "20 - Combined Query Test",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=25&cursor=5&sortBy=market_cap_sol&sortOrder=asc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "limit", "value": "25"},
+            {"key": "cursor", "value": "5"},
+            {"key": "sortBy", "value": "market_cap_sol"},
+            {"key": "sortOrder", "value": "asc"}
+          ]
+        },
+        "description": "✅ Test combined query parameters (complex query)"
+      }
+    }
+  ]
+}
