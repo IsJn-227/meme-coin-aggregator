@@ -1,0 +1,137 @@
+{
+  "info": {
+    "name": "Meme Coin Aggregator API",
+    "description": "Real-time meme coin data aggregation service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://meme-coin-aggregator-e8er.onrender.com/health",
+          "protocol": "https",
+          "host": ["meme-coin-aggregator-e8er", "onrender", "com"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Get All Tokens",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens",
+          "protocol": "https",
+          "host": ["meme-coin-aggregator-e8er", "onrender", "com"],
+          "path": ["api", "tokens"]
+        }
+      }
+    },
+    {
+      "name": "Get Tokens - Paginated (10)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens?limit=10",
+          "protocol": "https",
+          "host": ["meme-coin-aggregator-e8er", "onrender", "com"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "limit", "value": "10"}]
+        }
+      }
+    },
+    {
+      "name": "Get Tokens - Sort by Volume",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens?sortBy=volume_sol&sortOrder=desc",
+          "protocol": "https",
+          "host": ["meme-coin-aggregator-e8er", "onrender", "com"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "sortBy", "value": "volume_sol"},
+            {"key": "sortOrder", "value": "desc"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Tokens - Sort by Market Cap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens?sortBy=market_cap_sol&sortOrder=desc",
+          "protocol": "https",
+          "host": ["meme-coin-aggregator-e8er", "onrender", "com"],
+          "path": ["api", "tokens"],
+          "query": [
+            {"key": "sortBy", "value": "market_cap_sol"},
+            {"key": "sortOrder", "value": "desc"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Tokens - 24h Filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens?timePeriod=24h",
+          "protocol": "https",
+          "host": ["meme-coin-aggregator-e8er", "onrender", "com"],
+          "path": ["api", "tokens"],
+          "query": [{"key": "timePeriod", "value": "24h"}]
+        }
+      }
+    },
+    {
+      "name": "Rapid Call 1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens"
+      }
+    },
+    {
+      "name": "Rapid Call 2",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens"
+      }
+    },
+    {
+      "name": "Rapid Call 3",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens"
+      }
+    },
+    {
+      "name": "Rapid Call 4",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens"
+      }
+    },
+    {
+      "name": "Rapid Call 5",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://meme-coin-aggregator-e8er.onrender.com/api/tokens"
+      }
+    }
+  ]
+}

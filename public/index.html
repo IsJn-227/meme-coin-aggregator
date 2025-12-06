@@ -1,31 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meme Coin Aggregator</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Meme Coin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <h1>Meme Coin Aggregator</h1>
-    <p class="subtitle">Live token data fetched from your backend API</p>
+  <header>
+    <h1>🚀 Meme Coin Aggregator</h1>
+    <p>Real-time Token Tracker (WebSocket + REST API)</p>
+  </header>
 
-    <div class="loader" id="loader">Loading tokens...</div>
+  <section id="config">
+    <h2>🔧 Connection Settings</h2>
 
-    <table id="tokenTable" class="hidden">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Ticker</th>
-                <th>Price (SOL)</th>
-                <th>Volume (24h)</th>
-                <th>Liquidity</th>
-            </tr>
-        </thead>
-        <tbody id="tokenBody"></tbody>
-    </table>
+    <label>WebSocket URL</label>
+    <input id="wsUrl" value="" />
 
-    <script src="script.js"></script>
+    <label>REST API URL</label>
+    <input id="restUrl" value="" />
+
+    <div class="btn-row">
+      <button id="connectBtn" class="blue">Connect</button>
+      <button id="disconnectBtn" class="grey">Disconnect</button>
+      <button id="testRestBtn" class="green">Test REST API</button>
+    </div>
+
+    <div id="statusBox" class="status disconnected">❌ Disconnected</div>
+  </section>
+
+  <!-- METRIC CARDS -->
+  <section id="stats">
+    <div class="stat-card">
+      <h3>Total Updates</h3>
+      <p id="updates">0</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Tokens Tracked</h3>
+      <p id="tokensTracked">0</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Connection Time</h3>
+      <p id="connTime">0s</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Last Update</h3>
+      <p id="lastUpdate">Never</p>
+    </div>
+  </section>
+
+  <!-- LIVE TOKENS -->
+  <section>
+    <h2>📊 Live Token Data (Top 5)</h2>
+    <div id="tokenList"></div>
+  </section>
+
+  <!-- LOGS -->
+  <section>
+    <h2>📜 Connection Logs</h2>
+    <pre id="logs"></pre>
+  </section>
+
+  <script src="script.js"></script>
 </body>
 </html>

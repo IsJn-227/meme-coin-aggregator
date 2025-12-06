@@ -1,51 +1,121 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #0d1117;
-    color: #e6edf3;
-    margin: 0;
-    padding: 20px;
+  font-family: "Inter", sans-serif;
+  background: #f3f4ff;
+  margin: 0;
+  padding: 0;
 }
 
-h1 {
-    text-align: center;
-    color: #58a6ff;
-    margin-bottom: 5px;
+header {
+  text-align: center;
+  padding: 25px 10px;
+  background: linear-gradient(135deg, #6b5bff, #8e85ff);
+  color: white;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.15);
 }
 
-.subtitle {
-    text-align: center;
-    color: #8b949e;
-    margin-bottom: 20px;
+#config {
+  width: 90%;
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
 }
 
-.loader {
-    text-align: center;
-    font-size: 20px;
+#config input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 15px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
 }
 
-table {
-    width: 90%;
-    margin: 0 auto;
-    border-collapse: collapse;
-    background: #161b22;
-    border-radius: 6px;
-    overflow: hidden;
+.btn-row {
+  display: flex;
+  gap: 10px;
 }
 
-th, td {
-    padding: 12px 15px;
-    text-align: left;
+button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-th {
-    background: #21262d;
-    color: #58a6ff;
+button.blue { background: #5a67ff; }
+button.blue:hover { background: #4855ff; }
+
+button.green { background: #2ecc71; }
+button.green:hover { background: #27ae60; }
+
+button.grey { background: #777; }
+button.grey:hover { background: #555; }
+
+.status {
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
 }
 
-tr:nth-child(even) {
-    background: #1c2128;
+.connected { background: #e0ffe8; color: #0b9b32; }
+.disconnected { background: #ffe3e3; color: #d60000; }
+
+/* STAT CARDS */
+#stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  width: 90%;
+  margin: 20px auto;
 }
 
-.hidden {
-    display: none;
+.stat-card {
+  text-align: center;
+  padding: 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6d6aff, #9b92ff);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.stat-card p {
+  font-size: 26px;
+  margin-top: 5px;
+}
+
+/* TOKENS */
+#tokenList {
+  width: 90%;
+  margin: auto;
+}
+
+.token-card {
+  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 12px;
+}
+
+.token-card h3 { margin: 0 0 10px; }
+
+/* LOGS */
+pre {
+  width: 90%;
+  margin: auto;
+  background: #1b1b1b;
+  color: #aaffaa;
+  padding: 15px;
+  height: 220px;
+  border-radius: 12px;
+  overflow-y: scroll;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
 }
