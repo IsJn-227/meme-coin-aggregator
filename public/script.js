@@ -1,76 +1,97 @@
 // ============================
-// AUTO-DETECT BACKEND URL
+// GLOBAL STATE
 // ============================
 const BASE_URL = window.location.origin;
 
-// Auto-fill fields on load
-window.addEventListener("DOMContentLoaded", () => {
-  const wsUrl = BASE_URL.replace("http", "ws") + "/ws"; 
-  const apiUrl = BASE_URL + "/api/tokens";
-
-  document.getElementById("ws-url").value = wsUrl;
-  document.getElementById("api-url").value = apiUrl;
-});
-
-let ws = null;
+let socket = null;
 let connectionStart = null;
 let updateCount = 0;
 
 // ============================
-// CONNECT TO WEBSOCKET
+// INITIALISE UI ON LOAD
 // ============================
-function connectWebSocket() {
-  const wsUrl = document.getElementById("ws-url").value;
+window.addEventListener("DOMContentLoaded", () => {
+  // Autofill connection fields
+  document.getElementById("ws-url").value = BASE_URL;
+  document.getElementById("api-url").value = BASE_URL + "/api/tokens";
 
-  if (!wsUrl.startsWith("ws")) {
-    log("Invalid WebSocket URL", "error");
+  // Wire buttons
+  document.getElementById("connectBtn").addEventListener("click", connectSocket);
+  document.getElementById("disconnectBtn").addEventListener("click", disconnectSocket);
+  document.getElementById("testRestBtn").addEventListener("click", testRestApi);
+});
+
+// ============================
+// CONNECT USING SOCKET.IO
+// ============================
+function connectSocket() {
+  const url = document.getElementById("ws-url").value || BASE_URL;
+
+  if (socket && socket.connected) {
+    log("Already connected", "info");
     return;
   }
 
-  ws = new WebSocket(wsUrl);
+  log(`Connecting to ${url} ...`, "info");
 
-  ws.onopen = () => {
-    log("Connected to WebSocket", "success");
+  socket = io(url, {
+    transports: ["websocket"],      // force websocket
+  });
+
+  socket.on("connect", () => {
+    log(`Connected (id: ${socket.id})`, "success");
 
     connectionStart = Date.now();
     updateConnectionTime();
 
-    ws.send(JSON.stringify({ type: "subscribe" }));
+    // Subscribe to token updates (must match server events)
+    socket.emit("subscribe:tokens");
 
     const status = document.getElementById("statusBox");
     status.className = "status connected";
     status.innerText = "🟢 Connected";
-  };
+  });
 
-  ws.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data);
-      updateLiveData(data);
+  socket.on("tokens:update", (update) => {
+    // update = { timestamp, tokens, count }
+    const tokens = update.tokens || [];
+    updateLiveTokens(tokens);
 
-      updateCount++;
-      document.getElementById("updates").innerText = updateCount;
-      document.getElementById("lastUpdate").innerText =
-        new Date().toLocaleTimeString();
-    } catch (err) {
-      log("Invalid WS message", "error");
-    }
-  };
+    updateCount++;
+    document.getElementById("updates").innerText = updateCount;
+    document.getElementById("lastUpdate").innerText =
+      new Date().toLocaleTimeString();
+  });
 
-  ws.onerror = () => log("WebSocket Error", "error");
+  socket.on("disconnect", () => {
+    log("Socket disconnected", "error");
+    resetStatusDisconnected();
+  });
 
-  ws.onclose = () => {
-    log("WebSocket Disconnected", "error");
-    const status = document.getElementById("statusBox");
-    status.className = "status disconnected";
-    status.innerText = "❌ Disconnected";
-  };
+  socket.on("connect_error", (err) => {
+    log("Socket connect error: " + err.message, "error");
+    resetStatusDisconnected();
+  });
 }
 
 // ============================
-// DISCONNECT WS
+// DISCONNECT SOCKET
 // ============================
-function disconnectWebSocket() {
-  if (ws) ws.close();
+function disconnectSocket() {
+  if (socket) {
+    socket.emit("unsubscribe:tokens");
+    socket.disconnect();
+    socket = null;
+  }
+  resetStatusDisconnected();
+}
+
+function resetStatusDisconnected() {
+  const status = document.getElementById("statusBox");
+  status.className = "status disconnected";
+  status.innerText = "❌ Disconnected";
+  connectionStart = null;
+  document.getElementById("connTime").innerText = "0s";
 }
 
 // ============================
@@ -82,9 +103,12 @@ async function testRestApi() {
 
   try {
     const res = await fetch(url);
-    const data = await res.json();
-    log("REST API OK ✓", "success");
-    updateLiveData(data);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();      // { data: [...] }
+
+    const tokens = data.data || [];
+    log(`REST API OK ✓ (${tokens.length} tokens)`, "success");
+    updateLiveTokens(tokens);
   } catch (e) {
     log("REST API FAILED: " + e.message, "error");
   }
@@ -101,7 +125,7 @@ function updateConnectionTime() {
 }
 
 // ============================
-// LOGGING FUNCTION
+// LOGGING
 // ============================
 function log(msg, type = "info") {
   const logs = document.getElementById("logs");
@@ -119,26 +143,24 @@ function log(msg, type = "info") {
 // ============================
 // RENDER TOKEN DATA
 // ============================
-function updateLiveData(payload) {
-  if (!payload || !payload.data) return;
-
+function updateLiveTokens(tokens) {
   const list = document.getElementById("tokenList");
   list.innerHTML = "";
 
-  const tokens = payload.data.slice(0, 5);
+  const top = tokens.slice(0, 5);
 
-  tokens.forEach((t) => {
+  top.forEach((t) => {
     const div = document.createElement("div");
     div.className = "token-card";
     div.innerHTML = `
-      <h3>${t.token_name}</h3>
-      <p>Price: ${t.price_sol}</p>
-      <p>24h Change: ${t.price_1hr_change}%</p>
-      <p>Volume: ${t.volume_sol} SOL</p>
-      <p>Market Cap: ${t.market_cap_sol} SOL</p>
+      <h3>${t.token_name || t.name || "Unknown"}</h3>
+      <p>Price: ${t.price_sol ?? t.price ?? "?"}</p>
+      <p>24h Change: ${t.price_1hr_change ?? t.price_24h_change ?? "?"}%</p>
+      <p>Volume: ${t.volume_sol ?? t.volume ?? "?"} SOL</p>
+      <p>Market Cap: ${t.market_cap_sol ?? t.market_cap ?? "?"} SOL</p>
     `;
     list.appendChild(div);
   });
 
-  document.getElementById("tokensTracked").innerText = tokens.length;
+  document.getElementById("tokensTracked").innerText = top.length;
 }
