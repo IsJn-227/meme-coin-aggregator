@@ -5,13 +5,12 @@ const BASE_URL = window.location.origin;
 
 // Auto-fill fields on load
 window.addEventListener("DOMContentLoaded", () => {
-  const wsUrl = BASE_URL.replace("http", "ws");  // no /ws
+  const wsUrl = BASE_URL.replace("http", "ws") + "/ws"; // MUST MATCH index.ts
   const apiUrl = BASE_URL + "/api/tokens";
 
   document.getElementById("ws-url").value = wsUrl;
   document.getElementById("api-url").value = apiUrl;
 });
-
 
 let ws = null;
 let connectionStart = null;
@@ -38,30 +37,32 @@ function connectWebSocket() {
 
     ws.send(JSON.stringify({ type: "subscribe" }));
 
-    document.getElementById("statusBox").className = "status connected";
-    document.getElementById("statusBox").innerText = "🟢 Connected";
+    const status = document.getElementById("statusBox");
+    status.className = "status connected";
+    status.innerText = "🟢 Connected";
   };
 
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
       updateLiveData(data);
+
       updateCount++;
       document.getElementById("updates").innerText = updateCount;
-      document.getElementById("lastUpdate").innerText = new Date().toLocaleTimeString();
+      document.getElementById("lastUpdate").innerText =
+        new Date().toLocaleTimeString();
     } catch (err) {
       log("Invalid WS message", "error");
     }
   };
 
-  ws.onerror = () => {
-    log("WebSocket Error", "error");
-  };
+  ws.onerror = () => log("WebSocket Error", "error");
 
   ws.onclose = () => {
     log("WebSocket Disconnected", "error");
-    document.getElementById("statusBox").className = "status disconnected";
-    document.getElementById("statusBox").innerText = "❌ Disconnected";
+    const status = document.getElementById("statusBox");
+    status.className = "status disconnected";
+    status.innerText = "❌ Disconnected";
   };
 }
 
@@ -100,15 +101,17 @@ function updateConnectionTime() {
 }
 
 // ============================
-// APPEND LOG
+// LOGGING
 // ============================
 function log(msg, type = "info") {
   const logs = document.getElementById("logs");
   const div = document.createElement("div");
 
   div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-  div.style.color = type === "error" ? "red" :
-                    type === "success" ? "lightgreen" : "white";
+  div.style.color =
+    type === "error" ? "red" :
+    type === "success" ? "lightgreen" :
+    "white";
 
   logs.prepend(div);
 }
@@ -124,7 +127,7 @@ function updateLiveData(payload) {
 
   const tokens = payload.data.slice(0, 5);
 
-  tokens.forEach(t => {
+  tokens.forEach((t) => {
     const div = document.createElement("div");
     div.className = "token-card";
     div.innerHTML = `
