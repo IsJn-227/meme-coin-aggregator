@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Coin Aggregator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Meme Coin Aggregator</h1>
+    <p class="subtitle">Live token data fetched from your backend API</p>
+
+    <div class="loader" id="loader">Loading tokens...</div>
+
+    <table id="tokenTable" class="hidden">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Ticker</th>
+                <th>Price (SOL)</th>
+                <th>Volume (24h)</th>
+                <th>Liquidity</th>
+            </tr>
+        </thead>
+        <tbody id="tokenBody"></tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>
