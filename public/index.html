@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Meme Coin Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -13,6 +13,9 @@
     <p>Real-time Token Tracker (WebSocket + REST API)</p>
   </header>
 
+  <!-- ===========================
+       CONNECTION SETTINGS
+  ============================ -->
   <section id="config">
     <h2>🔧 Connection Settings</h2>
 
@@ -31,7 +34,9 @@
     <div id="statusBox" class="status disconnected">❌ Disconnected</div>
   </section>
 
-  <!-- METRIC CARDS -->
+  <!-- ===========================
+       METRIC CARDS
+  ============================ -->
   <section id="stats">
     <div class="stat-card">
       <h3>Total Updates</h3>
@@ -54,13 +59,17 @@
     </div>
   </section>
 
-  <!-- LIVE TOKENS -->
+  <!-- ===========================
+       LIVE TOKEN LIST
+  ============================ -->
   <section>
     <h2>📊 Live Token Data (Top 5)</h2>
     <div id="tokenList"></div>
   </section>
 
-  <!-- LOGS -->
+  <!-- ===========================
+       LOGS
+  ============================ -->
   <section>
     <h2>📜 Connection Logs</h2>
     <pre id="logs"></pre>
