@@ -1,96 +1,74 @@
+// ============================
+// AUTO-DETECT RENDER URL
+// ============================
+const BASE_URL = window.location.origin;
+
+// Auto-fill fields as soon as page loads
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("ws-url").value = BASE_URL.replace("http", "ws");
+  document.getElementById("api-url").value = BASE_URL + "/api/tokens";
+});
+
 let ws = null;
-let updateCount = 0;
-let startTime = null;
 
-const log = (msg) => {
-    const box = document.getElementById("logs");
-    box.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
-    box.scrollTop = box.scrollHeight;
-};
+// ============================
+// CONNECT WEBSOCKET
+// ============================
+function connectWebSocket() {
+  const wsUrl = document.getElementById("ws-url").value;
 
-document.getElementById("connectBtn").onclick = () => {
-    const wsUrl = document.getElementById("wsUrl").value;
-    const restUrl = document.getElementById("restUrl").value;
+  ws = new WebSocket(wsUrl);
 
-    if (!wsUrl) return alert("Enter WebSocket URL");
+  ws.onopen = () => {
+    log("Connected to WebSocket", "success");
+    ws.send(JSON.stringify({ type: "subscribe" }));
+  };
 
-    ws = new WebSocket(wsUrl);
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    updateLiveData(data);
+  };
 
-    ws.onopen = () => {
-        log("🔌 Connected to WebSocket");
-        startTime = Date.now();
+  ws.onclose = () => log("Disconnected", "error");
+  ws.onerror = (err) => log("WebSocket Error: " + err.message, "error");
+}
 
-        document.getElementById("statusBox").className = "status connected";
-        document.getElementById("statusBox").innerText = "✅ Connected";
+// ============================
+// TEST REST API
+// ============================
+async function testRestApi() {
+  const url = document.getElementById("api-url").value;
+  log("Testing REST API...", "info");
 
-        ws.send(JSON.stringify({ type: "subscribe_tokens" }));
-    };
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    log("REST API OK", "success");
+    updateLiveData(data);
+  } catch (e) {
+    log("REST API FAILED: " + e.message, "error");
+  }
+}
 
-    ws.onmessage = (msg) => {
-        const data = JSON.parse(msg.data);
+// ============================
+// LOGGING FUNCTION
+// ============================
+function log(message, type = "info") {
+  const logs = document.getElementById("logs");
+  const entry = document.createElement("div");
 
-        updateCount++;
-        document.getElementById("updates").innerText = updateCount;
-        document.getElementById("lastUpdate").innerText = new Date().toLocaleTimeString();
+  entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+  entry.style.color =
+    type === "error" ? "red" :
+    type === "success" ? "lightgreen" : "#ddd";
 
-        if (data.tokens) {
-            document.getElementById("tokensTracked").innerText = data.tokens.length;
-            renderTokens(data.tokens.slice(0, 5));
-        }
+  logs.prepend(entry);
+}
 
-        log(`📊 Received update (${updateCount})`);
-    };
-
-    ws.onclose = () => {
-        document.getElementById("statusBox").className = "status disconnected";
-        document.getElementById("statusBox").innerText = "❌ Disconnected";
-        log("❌ WebSocket disconnected");
-    };
-
-    setInterval(() => {
-        if (startTime) {
-            const sec = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById("connTime").innerText = sec + "s";
-        }
-    }, 1000);
-};
-
-document.getElementById("disconnectBtn").onclick = () => {
-    if (ws) ws.close();
-};
-
-document.getElementById("testRestBtn").onclick = async () => {
-    const url = document.getElementById("restUrl").value;
-
-    try {
-        log("🔎 Testing REST API…");
-        const res = await fetch(url);
-        const json = await res.json();
-        log("✅ REST OK: " + JSON.stringify(json).slice(0, 80) + "...");
-    } catch (err) {
-        log("❌ REST Error: " + err.message);
-    }
-};
-
-// RENDER TOKEN CARDS
-function renderTokens(tokens) {
-    const box = document.getElementById("tokenList");
-    box.innerHTML = "";
-
-    tokens.forEach(t => {
-        const div = document.createElement("div");
-        div.className = "token-card";
-
-        div.innerHTML = `
-            <h3>${t.token_name}</h3>
-            <p>Price: $${t.price_sol}</p>
-            <p>24h Change: <span style="color:${t.price_1hr_change >= 0 ? 'green' : 'red'}">
-                ${t.price_1hr_change}%
-            </span></p>
-            <p>Volume: ${t.volume_sol} SOL</p>
-            <p>Market Cap: ${t.market_cap_sol} SOL</p>
-        `;
-
-        box.appendChild(div);
-    });
+// ============================
+// UPDATE UI WITH TOKEN DATA
+// ============================
+function updateLiveData(data) {
+  console.log("Update received:", data);
+  // Add your UI rendering logic here
 }
