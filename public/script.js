@@ -5,9 +5,13 @@ const BASE_URL = window.location.origin;
 
 // Auto-fill fields on load
 window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("ws-url").value = BASE_URL.replace("http", "ws");
-  document.getElementById("api-url").value = BASE_URL + "/api/tokens";
+  const wsUrl = BASE_URL.replace("http", "ws");  // no /ws
+  const apiUrl = BASE_URL + "/api/tokens";
+
+  document.getElementById("ws-url").value = wsUrl;
+  document.getElementById("api-url").value = apiUrl;
 });
+
 
 let ws = null;
 let connectionStart = null;
