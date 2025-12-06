@@ -7,6 +7,7 @@ import config from './config';
 import tokenRoutes from './routes/tokenRoutes';
 import logger from './utils/logger';
 import { WebSocketService } from './services/websocketService';
+import path from "path";
 
 const app = express();
 
@@ -26,6 +27,10 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api', tokenRoutes);
+// ----------------------
+// Serve Frontend (Static Files)
+// ----------------------
+app.use(express.static(path.join(__dirname, "../public")));
 
 app.use((err: any, req: any, res: any, next: any) => {
   logger.error('Unhandled error:', err);
