@@ -3,10 +3,10 @@
 // ============================
 const BASE_URL = window.location.origin;
 
-// Auto-fill fields as soon as page loads
+// Auto-fill fields on load
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("ws-url").value = BASE_URL.replace("http", "ws");
-  document.getElementById("api-url").value = BASE_URL + "/api/tokens";
+  document.getElementById("api-url").value = BASE_URL + "/api";
 });
 
 let ws = null;
@@ -17,11 +17,15 @@ let ws = null;
 function connectWebSocket() {
   const wsUrl = document.getElementById("ws-url").value;
 
+  if (!wsUrl) {
+    log("❌ WebSocket URL is empty!", "error");
+    return;
+  }
+
   ws = new WebSocket(wsUrl);
 
   ws.onopen = () => {
-    log("Connected to WebSocket", "success");
-    ws.send(JSON.stringify({ type: "subscribe" }));
+    log("🟢 Connected to WebSocket", "success");
   };
 
   ws.onmessage = (event) => {
@@ -29,21 +33,33 @@ function connectWebSocket() {
     updateLiveData(data);
   };
 
-  ws.onclose = () => log("Disconnected", "error");
-  ws.onerror = (err) => log("WebSocket Error: " + err.message, "error");
+  ws.onclose = () => log("🔴 WebSocket Disconnected", "error");
+  ws.onerror = (err) => log("⚠ WebSocket Error: " + err.message, "error");
+}
+
+// ============================
+// DISCONNECT WEBSOCKET
+// ============================
+function disconnectWebSocket() {
+  if (ws) {
+    ws.close();
+  }
 }
 
 // ============================
 // TEST REST API
 // ============================
 async function testRestApi() {
-  const url = document.getElementById("api-url").value;
-  log("Testing REST API...", "info");
+  const baseApi = document.getElementById("api-url").value;
+  const fullUrl = baseApi + "/tokens";
+
+  log("Testing REST API…", "info");
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(fullUrl);
     const data = await res.json();
-    log("REST API OK", "success");
+
+    log("REST API OK ✔", "success");
     updateLiveData(data);
   } catch (e) {
     log("REST API FAILED: " + e.message, "error");
@@ -60,7 +76,7 @@ function log(message, type = "info") {
   entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
   entry.style.color =
     type === "error" ? "red" :
-    type === "success" ? "lightgreen" : "#ddd";
+    type === "success" ? "lightgreen" : "#ccc";
 
   logs.prepend(entry);
 }
@@ -69,6 +85,14 @@ function log(message, type = "info") {
 // UPDATE UI WITH TOKEN DATA
 // ============================
 function updateLiveData(data) {
-  console.log("Update received:", data);
-  // Add your UI rendering logic here
+  console.log("🔥 Live update received:", data);
+
+  // TODO — Add UI rendering logic here (I can build a beautiful UI)
 }
+
+// ============================
+// ATTACH BUTTON EVENTS
+// ============================
+document.getElementById("connectBtn").onclick = connectWebSocket;
+document.getElementById("disconnectBtn").onclick = disconnectWebSocket;
+document.getElementById("testRestBtn").onclick = testRestApi;
