@@ -5,7 +5,7 @@ const BASE_URL = window.location.origin;
 
 // Auto-fill fields on load
 window.addEventListener("DOMContentLoaded", () => {
-  const wsUrl = BASE_URL.replace("http", "ws") + "/ws"; // MUST MATCH index.ts
+  const wsUrl = BASE_URL.replace("http", "ws") + "/ws"; 
   const apiUrl = BASE_URL + "/api/tokens";
 
   document.getElementById("ws-url").value = wsUrl;
@@ -101,7 +101,7 @@ function updateConnectionTime() {
 }
 
 // ============================
-// LOGGING
+// LOGGING FUNCTION
 // ============================
 function log(msg, type = "info") {
   const logs = document.getElementById("logs");

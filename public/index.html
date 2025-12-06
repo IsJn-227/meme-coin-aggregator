@@ -67,6 +67,15 @@
     <pre id="logs"></pre>
   </section>
 
+  <!-- load main script FIRST -->
   <script src="script.js"></script>
+
+  <!-- THEN bind buttons -->
+  <script>
+    document.getElementById("connectBtn").onclick = connectWebSocket;
+    document.getElementById("disconnectBtn").onclick = disconnectWebSocket;
+    document.getElementById("testRestBtn").onclick = testRestApi;
+  </script>
+
 </body>
 </html>
