@@ -43,7 +43,7 @@ const httpServer = createServer(app);
 const wsService = new WebSocketService(httpServer);
 wsService.startPeriodicUpdates();
 
-const PORT = config.port;
+const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
