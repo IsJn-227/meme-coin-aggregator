@@ -2,17 +2,17 @@
 
 Real-time meme coin data aggregation service with WebSocket support and REST API.
 
-## 🌐 Live Deployment
+### 🌍 Live Deployment
 
-**Public URL:** https://meme-coin-aggregator-e8er.onrender.com
+**Public URL:** https://meme-coin-aggregator-project.onrender.com  
 
-- **REST API:** https://meme-coin-aggregator-e8er.onrender.com/api/tokens
-- **WebSocket:** wss://meme-coin-aggregator-e8er.onrender.com
-- **Health Check:** https://meme-coin-aggregator-e8er.onrender.com/health
+- **REST API:** https://meme-coin-aggregator-project.onrender.com/api/tokens  
+- **WebSocket (Socket.IO):** wss://meme-coin-aggregator-project.onrender.com/socket.io/  
+- **Health Check:** https://meme-coin-aggregator-project.onrender.com/health
 
 ## 📹 Demo Video
 
-**YouTube Demo:** [Insert your YouTube link here after recording]
+**YouTube Demo:** https://www.youtube.com/watch?v=Y0paFe_O4hQ&t=21s
 
 ## 🏗️ Architecture & Design Decisions
 
