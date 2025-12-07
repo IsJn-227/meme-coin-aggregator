@@ -24,15 +24,14 @@ export class WebSocketService {
       logger.info(`Client connected: ${socket.id}`);
 
       socket.on('subscribe:tokens', () => {
-        logger.debug(`Client ${socket.id} subscribed to token updates`);
+        logger.info(`Client ${socket.id} subscribed to token updates`);
         socket.join('token-updates');
-        
-        // Send initial data
-        this.sendTokenUpdate(socket.id);
+
+        this.sendTokenUpdate(socket.id);  // send initial update
       });
 
       socket.on('unsubscribe:tokens', () => {
-        logger.debug(`Client ${socket.id} unsubscribed from token updates`);
+        logger.info(`Client ${socket.id} unsubscribed`);
         socket.leave('token-updates');
       });
 
@@ -62,22 +61,20 @@ export class WebSocketService {
         this.io.to('token-updates').emit('tokens:update', update);
       }
 
-      logger.debug(`Sent token update to ${socketId || 'all subscribers'}`);
+      logger.info(`Sent token update to ${socketId || 'all subscribers'}`);
     } catch (error) {
       logger.error('Error sending token update', error);
     }
   }
 
   public startPeriodicUpdates(): void {
-    if (this.updateInterval) {
-      return;
-    }
+    if (this.updateInterval) return;
 
-    logger.info(`Starting periodic WebSocket updates every ${this.UPDATE_INTERVAL / 1000}s`);
+    logger.info(`Starting periodic updates every ${this.UPDATE_INTERVAL / 1000}s`);
 
     this.updateInterval = setInterval(async () => {
-      const socketsInRoom = await this.io.in('token-updates').fetchSockets();
-      if (socketsInRoom.length > 0) {
+      const sockets = await this.io.in('token-updates').fetchSockets();
+      if (sockets.length > 0) {
         await this.sendTokenUpdate();
       }
     }, this.UPDATE_INTERVAL);
@@ -87,7 +84,7 @@ export class WebSocketService {
     if (this.updateInterval) {
       clearInterval(this.updateInterval);
       this.updateInterval = null;
-      logger.info('Stopped periodic WebSocket updates');
+      logger.info('Stopped periodic updates');
     }
   }
 

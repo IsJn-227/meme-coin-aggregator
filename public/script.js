@@ -11,49 +11,39 @@ let updateCount = 0;
 // INITIALISE UI ON LOAD
 // ============================
 window.addEventListener("DOMContentLoaded", () => {
-  // Autofill connection fields
   document.getElementById("ws-url").value = BASE_URL;
   document.getElementById("api-url").value = BASE_URL + "/api/tokens";
 
-  // Wire buttons
-  document.getElementById("connectBtn").addEventListener("click", connectSocket);
-  document.getElementById("disconnectBtn").addEventListener("click", disconnectSocket);
-  document.getElementById("testRestBtn").addEventListener("click", testRestApi);
+  document.getElementById("connectBtn").onclick = connectSocket;
+  document.getElementById("disconnectBtn").onclick = disconnectSocket;
+  document.getElementById("testRestBtn").onclick = testRestApi;
 });
 
 // ============================
-// CONNECT USING SOCKET.IO
+// CONNECT (SOCKET.IO)
 // ============================
 function connectSocket() {
-  const url = document.getElementById("ws-url").value || BASE_URL;
+  const url = document.getElementById("ws-url").value;
 
-  if (socket && socket.connected) {
-    log("Already connected", "info");
-    return;
-  }
-
-  log(`Connecting to ${url} ...`, "info");
+  log(`Connecting to ${url} ...`);
 
   socket = io(url, {
-    transports: ["websocket"],      // force websocket
+    transports: ["websocket"],  // force websocket
   });
 
   socket.on("connect", () => {
     log(`Connected (id: ${socket.id})`, "success");
 
     connectionStart = Date.now();
-    updateConnectionTime();
+    requestAnimationFrame(updateConnectionTime);
 
-    // Subscribe to token updates (must match server events)
+    // IMPORTANT: subscribe AFTER connection
     socket.emit("subscribe:tokens");
 
-    const status = document.getElementById("statusBox");
-    status.className = "status connected";
-    status.innerText = "🟢 Connected";
+    setStatusConnected();
   });
 
   socket.on("tokens:update", (update) => {
-    // update = { timestamp, tokens, count }
     const tokens = update.tokens || [];
     updateLiveTokens(tokens);
 
@@ -65,12 +55,12 @@ function connectSocket() {
 
   socket.on("disconnect", () => {
     log("Socket disconnected", "error");
-    resetStatusDisconnected();
+    setStatusDisconnected();
   });
 
   socket.on("connect_error", (err) => {
-    log("Socket connect error: " + err.message, "error");
-    resetStatusDisconnected();
+    log("Connect Error: " + err.message, "error");
+    setStatusDisconnected();
   });
 }
 
@@ -83,15 +73,21 @@ function disconnectSocket() {
     socket.disconnect();
     socket = null;
   }
-  resetStatusDisconnected();
+  setStatusDisconnected();
 }
 
-function resetStatusDisconnected() {
+function setStatusConnected() {
+  const status = document.getElementById("statusBox");
+  status.className = "status connected";
+  status.innerText = "🟢 Connected";
+}
+
+function setStatusDisconnected() {
   const status = document.getElementById("statusBox");
   status.className = "status disconnected";
   status.innerText = "❌ Disconnected";
-  connectionStart = null;
   document.getElementById("connTime").innerText = "0s";
+  connectionStart = null;
 }
 
 // ============================
@@ -99,15 +95,15 @@ function resetStatusDisconnected() {
 // ============================
 async function testRestApi() {
   const url = document.getElementById("api-url").value;
-  log("Testing REST API...", "info");
+  log("Testing REST API...");
 
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();      // { data: [...] }
+    const json = await res.json();
 
-    const tokens = data.data || [];
+    const tokens = json.data || [];
     log(`REST API OK ✓ (${tokens.length} tokens)`, "success");
+
     updateLiveTokens(tokens);
   } catch (e) {
     log("REST API FAILED: " + e.message, "error");
@@ -119,8 +115,10 @@ async function testRestApi() {
 // ============================
 function updateConnectionTime() {
   if (!connectionStart) return;
+
   const seconds = Math.floor((Date.now() - connectionStart) / 1000);
   document.getElementById("connTime").innerText = seconds + "s";
+
   requestAnimationFrame(updateConnectionTime);
 }
 
@@ -149,18 +147,18 @@ function updateLiveTokens(tokens) {
 
   const top = tokens.slice(0, 5);
 
-  top.forEach((t) => {
+  for (const t of top) {
     const div = document.createElement("div");
     div.className = "token-card";
     div.innerHTML = `
-      <h3>${t.token_name || t.name || "Unknown"}</h3>
-      <p>Price: ${t.price_sol ?? t.price ?? "?"}</p>
-      <p>24h Change: ${t.price_1hr_change ?? t.price_24h_change ?? "?"}%</p>
-      <p>Volume: ${t.volume_sol ?? t.volume ?? "?"} SOL</p>
-      <p>Market Cap: ${t.market_cap_sol ?? t.market_cap ?? "?"} SOL</p>
+      <h3>${t.token_name || "Unknown"}</h3>
+      <p>Price: ${t.price_sol ?? "?"}</p>
+      <p>24h Change: ${t.price_1hr_change ?? "?"}%</p>
+      <p>Volume: ${t.volume_sol ?? "?"} SOL</p>
+      <p>Market Cap: ${t.market_cap_sol ?? "?"} SOL</p>
     `;
     list.appendChild(div);
-  });
+  }
 
   document.getElementById("tokensTracked").innerText = top.length;
 }
