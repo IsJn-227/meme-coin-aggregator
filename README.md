@@ -1,4 +1,4 @@
-﻿# 🚀 Meme Coin Aggregator - Real-time Data Service
+# 🚀 Meme Coin Aggregator - Real-time Data Service
 
 Real-time meme coin data aggregation service with WebSocket support and REST API.
 
@@ -99,40 +99,15 @@ Response:
 Get paginated token list
 
 **Query Parameters:**
-- `limit` (number, default: 20) - Tokens per page
-- `cursor` (string) - Next page cursor
-- `sortBy` (string) - Sort field: `volume_sol`, `market_cap_sol`, `price_1hr_change`
-- `sortOrder` (string) - `asc` or `desc`
-- `timePeriod` (string) - `1h`, `24h`, `7d`
+- `limit` (number, default: 20)
+- `cursor` (string)
+- `sortBy` (string) — `volume_sol`, `market_cap_sol`, `price_1hr_change`
+- `sortOrder` — `asc` or `desc`
+- `timePeriod` — `1h`, `24h`, `7d`
 
 **Example:**
 ```bash
 curl "https://meme-coin-aggregator-e8er.onrender.com/api/tokens?limit=10&sortBy=volume_sol&sortOrder=desc"
-```
-
-Response:
-```json
-{
-  "data": [
-    {
-      "token_address": "576P1t7XsRL4ZVj38LV2eYWxXRPguBADA8BxcNz1xo8y",
-      "token_name": "PIPE CTO",
-      "token_ticker": "PIPE",
-      "price_sol": 4.4141209798877615e-7,
-      "market_cap_sol": 441.41209798877617,
-      "volume_sol": 1322.4350391679925,
-      "liquidity_sol": 149.359428555,
-      "transaction_count": 2205,
-      "price_1hr_change": 120.61,
-      "protocol": "Raydium CLMM"
-    }
-  ],
-  "pagination": {
-    "limit": 10,
-    "hasMore": true,
-    "nextCursor": "xyz123"
-  }
-}
 ```
 
 ### **WebSocket Events**
@@ -171,64 +146,115 @@ npm run test:coverage
 ```
 
 ### **Test Coverage**
-- Unit tests: Services, controllers, utilities
-- Integration tests: API endpoints, WebSocket connections
-- Edge cases: Rate limiting, error handling, cache failures
+- Unit tests: Services, controllers, utilities  
+- Integration tests: API endpoints, WebSocket connections  
+- Edge cases: Rate limiting, error handling, cache failures  
 
 ## 📦 Postman Collection
 
 Import the collection from: `postman_collection.json`
 
 **Included Requests:**
-1. Health Check
-2. Get All Tokens
-3. Get Tokens with Pagination
-4. Get Tokens Sorted by Volume
-5. Get Tokens with Time Period Filter
-6. Rapid API Calls (5x)
-7. Error Handling Tests
+1. Health Check  
+2. Get All Tokens  
+3. Get Tokens with Pagination  
+4. Get Tokens Sorted by Volume  
+5. Get Tokens with Time Period Filter  
+6. Rapid API Calls (5x)  
+7. Error Handling Tests  
 
 ## 🛠️ Development
 
 ### **Project Structure**
 ```
 src/
-├── config/          # Configuration files
-├── controllers/     # Request handlers
-├── routes/          # API routes
-├── services/        # Business logic
+├── config/
+├── controllers/
+├── routes/
+├── services/
 │   ├── tokenService.ts
 │   ├── cacheService.ts
 │   ├── websocketService.ts
 │   ├── dexScreenerService.ts
 │   └── jupiterService.ts
-├── websocket/       # WebSocket handlers
-├── utils/           # Helper functions
-├── types/           # TypeScript types
-└── index.ts         # Entry point
+├── websocket/
+├── utils/
+├── types/
+└── index.ts
 ```
 
 ### **Key Files**
-- `index.ts` - Server initialization
-- `services/websocketService.ts` - WebSocket logic
-- `services/tokenService.ts` - Data aggregation
-- `services/cacheService.ts` - Redis caching
+- `index.ts` — Server initialization  
+- `services/websocketService.ts` — WebSocket logic  
+- `services/tokenService.ts` — Data aggregation  
+- `services/cacheService.ts` — Redis caching  
 
 ## 📊 Performance Metrics
 
-- **API Response Time:** <200ms (with cache)
-- **WebSocket Update Interval:** 30s
-- **Cache Hit Rate:** ~95%
-- **Rate Limit Handling:** Exponential backoff
-- **Concurrent Connections:** 100+ supported
+- **API Response Time:** <200ms (with cache)  
+- **WebSocket Update Interval:** 30s  
+- **Cache Hit Rate:** ~95%  
+- **Supports:** 100+ concurrent clients  
 
 ## 🔒 Security
 
-- Helmet.js for HTTP headers
-- CORS enabled
-- Rate limiting per IP
-- Input validation
-- No sensitive data exposure
+- Helmet.js  
+- CORS  
+- Rate limiting  
+- Input validation  
+- Sanitized responses  
+
+---
+
+# 📈 Quant Module (New)
+
+A complete quantitative research + backtesting engine integrated into the project.
+
+## **1. Fetch Historical Price Data**
+```bash
+npx ts-node scripts/fetch_historical.ts bitcoin usd 365
+```
+Saved to:
+```
+quant/data/token_prices/bitcoin.csv
+```
+
+## **2. Supported Strategies**
+- **Momentum Strategy** (`quant/strategies/momentum.ts`)  
+- **Mean Reversion Strategy** (`quant/strategies/meanReversion.ts`)  
+
+## **3. Run a Backtest**
+```bash
+npx ts-node quant/run_backtest.ts quant/data/token_prices/bitcoin.csv momentum 20
+```
+Outputs saved to:
+```
+quant/results/
+```
+
+## **4. Quant Folder Structure**
+```
+quant/
+├── data/
+│   └── token_prices/
+├── results/
+├── strategies/
+│   ├── momentum.ts
+│   └── meanReversion.ts
+├── backtester.ts
+├── metrics.ts
+└── run_backtest.ts
+```
+
+## **5. Metrics Provided**
+- **Cumulative Return**  
+- **Max Drawdown**  
+- **Sharpe-like Ratio**  
+- **NAV Curve**  
+
+This quant module demonstrates real-world quant engineering: data ingestion, signal generation, backtesting engine design, and portfolio simulation.
+
+---
 
 ## 📝 License
 
@@ -236,7 +262,7 @@ MIT
 
 ## 👤 Author
 
-[Your Name]
+Ishita Jain
 
 ## 🤝 Contributing
 
