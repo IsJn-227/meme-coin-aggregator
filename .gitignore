@@ -38,3 +38,7 @@ coverage/
 # Misc
 *.pem
 .cache/
+
+# Quant
+/quant/data/token_prices/*
+/quant/results/*
